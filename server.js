@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 5002;
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-frontend-url.vercel.app'] // Você atualizará isto depois
+    ? ['https://ticket-deer.vercel.app', 'http://localhost:3001'] // Permitir tanto o frontend em produção quanto local
     : ['http://localhost:3001']
 }));
 app.use(bodyParser.json());
@@ -22,6 +22,11 @@ let teamMembers = [
   { id: 4, name: 'Sarah Williams', skills: ['TypeScript', 'Angular', 'AWS'] },
   { id: 5, name: 'Tom Brown', skills: ['Go', 'Docker', 'Kubernetes'] }
 ];
+
+// Root route
+app.get('/', (req, res) => {
+  res.json({ message: 'Ticket Deer API is running' });
+});
 
 // Routes
 app.get('/api/team-members', (req, res) => {
@@ -61,6 +66,17 @@ app.put('/api/tickets/:id/status', (req, res) => {
 
   ticket.status = status;
   res.json(ticket);
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
 });
 
 app.listen(PORT, () => {
